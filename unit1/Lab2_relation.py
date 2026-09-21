@@ -47,7 +47,9 @@ class Message:
         self.receiver = receiver
 
     def send(self):
-        print(f"Message from {self.sender.username} to {self.receiver.username}: {self.text}")
+        print(
+            f"Message from {self.sender.username} to {self.receiver.username}: {self.text}"
+        )
 
 
 # Instances
@@ -55,7 +57,11 @@ user_lesly = User("Lesly", "Terrazo", "lesly_terrazor", "1234")
 user_carlos = User("Carlos", "Perez", "carlos_p", "abcd")
 
 post_lesly = Post("ex test", user_lesly, likes=3)
+post_lesly1 = Post("ex test", user_lesly, likes=3)
+post_lesly2 = Post("ex test", user_lesly, likes=3)
 user_lesly.add_post(post_lesly)
+user_lesly.add_post(post_lesly1)
+user_lesly.add_post(post_lesly2)
 
 comment = Comments("comment", user_carlos, post_lesly, likes=1)
 comment.show_comment()
