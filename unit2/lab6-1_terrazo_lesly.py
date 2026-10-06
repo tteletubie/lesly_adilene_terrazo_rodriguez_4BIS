@@ -17,6 +17,10 @@ class SmartDevice(ABC):
     def turn_on(self):
         pass
 
+    @abstractmethod
+    def turn_off(self):
+        pass
+
 
 class SmartLight(SmartDevice):
     def __init__(self):
@@ -24,6 +28,9 @@ class SmartLight(SmartDevice):
 
     def turn_on(self):
         return f"{self.name} set the brightness to 70%"
+
+    def turn_off(self):
+        return f"{self.name} was turned off"
 
 
 class SmartSpeaker(SmartDevice):
@@ -33,6 +40,9 @@ class SmartSpeaker(SmartDevice):
     def turn_on(self):
         return f"{self.name} is now ready to play music"
 
+    def turn_off(self):
+        return f"{self.name} stopped playing and was turned off"
+
 
 class SmartFridge(SmartDevice):
     def __init__(self):
@@ -40,6 +50,9 @@ class SmartFridge(SmartDevice):
 
     def turn_on(self):
         return f"{self.name} is now operating at optimal temperature"
+
+    def turn_off(self):
+        return f"{self.name} cooling system was turned off"
 
 
 class SmartThermostat(SmartDevice):
@@ -49,6 +62,20 @@ class SmartThermostat(SmartDevice):
     def turn_on(self):
         return f"{self.name} is set to 22 degrees Celsius"
 
+    def turn_off(self):
+        return f"{self.name} was turned off"
+
+
+class SmartCamera(SmartDevice):
+    def __init__(self):
+        super().__init__("Front Door Camera")
+
+    def turn_on(self):
+        return f"{self.name} is recording and monitoring the entrance"
+
+    def turn_off(self):
+        return f"{self.name} stopped recording and was turned off"
+
 
 # GUI with tkinter
 class PolymorphicAppTemplate(tk.Tk):
@@ -57,7 +84,7 @@ class PolymorphicAppTemplate(tk.Tk):
 
         # --- 1. WINDOW SETTINGS---
         self.title("OOP Lab: Polymorphism GUI Template")
-        self.geometry("480x360")
+        self.geometry("520x520")
         self.resizable(True, True)
         self.dark_mode = False
         self.colors = {
@@ -96,6 +123,7 @@ class PolymorphicAppTemplate(tk.Tk):
             "Smart Fridge": SmartFridge(),
             "Smart Light": SmartLight(),
             "Smart Thermostat": SmartThermostat(),
+            "Smart Camera": SmartCamera(),
         }
 
         # Build visual components
@@ -149,6 +177,18 @@ class PolymorphicAppTemplate(tk.Tk):
         )
         self.btn_action.pack(side="left", padx=5)
 
+        self.btn_turn_off = tk.Button(
+            self.controls,
+            text="TURN OFF",
+            command=self._handle_turn_off,
+            font=("DejaVu Sans", 11, "bold"),
+            relief="flat",
+            cursor="hand2",
+            padx=12,
+            pady=6,
+        )
+        self.btn_turn_off.pack(side="left", padx=5)
+
         self.theme_button = tk.Button(
             self.controls,
             text="DARK MODE",
@@ -172,6 +212,21 @@ class PolymorphicAppTemplate(tk.Tk):
             justify="center",
         )
         self.lbl_output.pack(fill="x", padx=20, pady=5)
+
+        self.lbl_log = tk.Label(
+            self,
+            text="ACTIVITY LOG",
+            font=("DejaVu Sans", 11, "bold"),
+        )
+        self.lbl_log.pack(anchor="w", padx=20, pady=(8, 2))
+
+        self.activity_log = tk.Listbox(
+            self,
+            height=6,
+            font=("DejaVu Sans", 10),
+            relief="flat",
+        )
+        self.activity_log.pack(fill="both", expand=True, padx=20, pady=(0, 12))
         self._apply_theme()
 
     def _apply_theme(self):
@@ -192,6 +247,13 @@ class PolymorphicAppTemplate(tk.Tk):
             activebackground=colors["text"],
             activeforeground=colors["button_text"],
         )
+        self.btn_turn_off.configure(
+            bg=colors["surface"],
+            fg=colors["text"],
+            activebackground=colors["output"],
+            activeforeground=colors["text"],
+            highlightbackground=colors["border"],
+        )
         self.theme_button.configure(
             text="LIGHT MODE" if self.dark_mode else "DARK MODE",
             bg=colors["surface"],
@@ -203,6 +265,13 @@ class PolymorphicAppTemplate(tk.Tk):
         self.lbl_output.configure(
             bg=colors["output"],
             fg=colors["muted"],
+        )
+        self.lbl_log.configure(bg=colors["background"], fg=colors["text"])
+        self.activity_log.configure(
+            bg=colors["surface"],
+            fg=colors["text"],
+            selectbackground=colors["button"],
+            selectforeground=colors["button_text"],
         )
 
         ttk.Style().configure(
@@ -217,18 +286,18 @@ class PolymorphicAppTemplate(tk.Tk):
         self._apply_theme()
 
     def _handle_action(self):
-        # 1. Get the current key selected by the user
+        self._run_device_action("turn_on")
+
+    def _handle_turn_off(self):
+        self._run_device_action("turn_off")
+
+    def _run_device_action(self, action_name: str):
         chosen_key = self.selected_key.get()
-
-        # 2. Retrieve the active polymorphic object
         active_object: SmartDevice = self.items[chosen_key]
+        result_message = getattr(active_object, action_name)()
 
-        # 3. POLYMORPHIC EXECUTION:
-        # No 'if/elif' logic needed. Python runs the appropriate implementation!
-        result_message = active_object.turn_on()
-
-        # 4. Display result in the UI
         self.lbl_output.config(text=result_message, font=("DejaVu Sans", 12, "normal"))
+        self.activity_log.insert(0, result_message)
 
 
 # =====================================================================
