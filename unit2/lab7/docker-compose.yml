@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: chacon_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - chacon_postgres:/var/lib/postgresql/data
+      - ./db_setup.sql:/docker-entrypoint-initdb.d/01-db-setup.sql:ro
+    networks:
+      - database_net
+
+networks:
+  database_net:
+    driver: bridge
+
+volumes:
+  chacon_postgres:
